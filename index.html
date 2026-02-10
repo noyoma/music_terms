@@ -22,11 +22,9 @@
         h1 { text-align: center; color: #302b63; font-size: 1.5em; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 0.8em; letter-spacing: 1px; }
         
-        /* 메인 프로그레스 (10문제 중 몇번인지) */
         .main-progress { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
         .main-fill { height: 100%; background: #302b63; width: 0%; transition: width 0.3s ease; }
         
-        /* 2초 타임어택 바 */
         .limit-bar-container { width: 100%; height: 4px; background: #eee; margin-bottom: 20px; display: none; }
         .limit-bar-fill { height: 100%; background: #e74c3c; width: 100%; }
 
@@ -48,8 +46,8 @@
         .option.incorrect { background: #e74c3c !important; color: white; border-color: #e74c3c; }
         .option.disabled { pointer-events: none; }
         
-        .waiting-msg { text-align: center; color: #302b63; font-weight: bold; margin-top: 50px; }
-        .timeout-msg { color: #e74c3c; font-weight: bold; text-align: center; margin-top: 10px; animation: flash 0.5s infinite; }
+        .status-msg-text { text-align: center; color: #302b63; font-weight: bold; margin-top: 10px; height: 20px; }
+        .timeout-msg { color: #e74c3c; font-weight: bold; text-align: center; animation: flash 0.5s infinite; }
         @keyframes flash { 50% { opacity: 0; } }
 
         .result-screen { text-align: center; display: none; padding: 40px 0; }
@@ -62,7 +60,7 @@
 <div class="container">
     <div id="quiz-screen">
         <h1>⚡ MUSIC TERMINOLOGY ATTACK</h1>
-        <p class="subtitle">단어 확인(3초) → 선택(2초 제한)</p>
+        <p class="subtitle">단어 확인(4초) → 선택(4초 제한)</p>
         
         <div class="main-progress"><div class="main-fill" id="main-fill"></div></div>
         <div class="limit-bar-container" id="limit-container"><div class="limit-bar-fill" id="limit-fill"></div></div>
@@ -76,7 +74,7 @@
             <div class="question-text" id="question-text">READY?</div>
         </div>
 
-        <div id="status-msg"></div>
+        <div id="status-msg" class="status-msg-text"></div>
         <div class="options" id="options-container"></div>
     </div>
 
@@ -287,7 +285,7 @@
         { english: "Performers' Federation", korean: "음악 실연자 연합회" },
         { english: "Project Profitability", korean: "프로젝트 수익성" },
         { english: "Cost of Flops", korean: "실패 비용" },
-        { english: "Diminished Incentive", korean: "창작 유인 감소" },
+        { english: "Dim인ished Incentive", korean: "창작 유인 감소" },
         { english: "Market Size Estimation", korean: "시장 규모 추산" },
         { english: "Piracy Pathway", korean: "불법 복제 경로" },
         { english: "Legitimate Pathway", korean: "합법적 경로" },
@@ -312,6 +310,7 @@
         { english: "Broadcasting Royalty", korean: "방송 사용료" },
         { english: "Retransmission Royalty", korean: "재전송 사용료" },
         { english: "Digital Per Unit Price", korean: "디지털 음원 단가" },
+        { english: "ARPU", korean: "가입자당 평균 수익" },
         { english: "Revenue per Impression", korean: "광고 노출당 수익" },
         { english: "Ad Inventory Share", korean: "광고 점유율" },
         { english: "Platform Fee", korean: "플랫폼 수수료" },
@@ -440,20 +439,20 @@
     function showQuestion() {
         isAnswered = false;
         const q = currentQuestions[idx];
-        const optionsContainer = document.getElementById('options-container');
         const statusMsg = document.getElementById('status-msg');
+        const optionsContainer = document.getElementById('options-container');
         const limitContainer = document.getElementById('limit-container');
 
-        // 초기화
         document.getElementById('current-idx').innerText = idx + 1;
         document.getElementById('current-score').innerText = score;
         document.getElementById('question-text').innerText = q.english;
         document.getElementById('main-fill').style.width = `${(idx + 1) * 10}%`;
+        
         optionsContainer.innerHTML = '';
         limitContainer.style.display = 'none';
-        statusMsg.innerHTML = `<div class="waiting-msg">🤔 단어를 외우세요... (3초)</div>`;
+        statusMsg.innerHTML = `🤔 단어를 외우세요... (4초)`;
 
-        // 3초 대기 후 보기 등장
+        // [변경] 보기 등장 전 대기 시간: 4초 (4000ms)
         mainTimer = setTimeout(() => {
             statusMsg.innerHTML = '';
             renderOptions(q);
@@ -481,12 +480,13 @@
             container.appendChild(div);
         });
 
-        // 2초 타임어택 시작
+        // [변경] 타이머 바 애니메이션 시간: 4초 (4s)
         setTimeout(() => {
-            limitFill.style.transition = 'width 2s linear';
+            limitFill.style.transition = 'width 4s linear';
             limitFill.style.width = '0%';
         }, 10);
 
+        // [변경] 답안 선택 제한 시간: 4초 (4000ms)
         limitTimer = setTimeout(() => {
             if (!isAnswered) handleTimeout(q.korean);
         }, 4000);
@@ -517,7 +517,7 @@
             o.classList.add('disabled');
             if(o.innerText.includes(actual)) o.classList.add('correct');
         });
-        document.getElementById('status-msg').innerHTML = `<div class="timeout-msg">⏰ TIME OUT! (틀림)</div>`;
+        document.getElementById('status-msg').innerHTML = `<div class="timeout-msg">⏰ TIME OUT!</div>`;
         goNext();
     }
 
@@ -537,9 +537,9 @@
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('final-score').innerText = score;
         
-        let msg = score === 100 ? "⚡ 신의 경지! 완벽한 순발력입니다!" : 
-                  score >= 70 ? "🔥 대단해요! 순발력이 엄청나시네요." : 
-                  "📚 용어를 좀 더 익히고 다시 도전해보세요!";
+        let msg = score === 100 ? "⚡ 완벽합니다! 최고의 실력이네요!" : 
+                  score >= 70 ? "🔥 대단해요! 지식이 아주 풍부하시네요." : 
+                  "📚 아쉽네요! 다시 한 번 복습해볼까요?";
         document.getElementById('score-message').innerText = msg;
     }
 
