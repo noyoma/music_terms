@@ -3,73 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>영어 음악산업 용어 퀴즈 (Master)</title>
+    <title>음악 용어 타임어택 퀴즈</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', AppleSDGothicNeo-Regular, sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
             min-height: 100vh;
             display: flex; justify-content: center; align-items: center; padding: 20px; color: #333;
         }
         .container {
-            background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-            max-width: 700px; width: 100%; padding: 40px; animation: fadeIn 0.5s ease-out;
+            background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            max-width: 600px; width: 100%; padding: 30px; animation: fadeIn 0.5s ease-out;
+            min-height: 580px; position: relative; overflow: hidden;
         }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        h1 { text-align: center; color: #1e3c72; margin-bottom: 5px; font-size: 1.8em; }
-        .subtitle { text-align: center; color: #666; margin-bottom: 25px; font-size: 0.9em; letter-spacing: 1px; }
-        .progress-bar { width: 100%; height: 8px; background: #eee; border-radius: 10px; margin-bottom: 15px; overflow: hidden; }
-        .progress-fill { height: 100%; background: #1e3c72; width: 0%; transition: width 0.3s ease; }
-        .info-header { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; color: #555; font-size: 0.9em; }
-        .question-box { background: #fdfdfd; padding: 35px 20px; border-radius: 15px; margin-bottom: 25px; text-align: center; border: 2px solid #1e3c72; }
-        .question-text { font-size: 1.7em; color: #1e3c72; font-weight: bold; word-break: keep-all; line-height: 1.3; }
-        .options { display: flex; flex-direction: column; gap: 12px; }
+        
+        h1 { text-align: center; color: #302b63; font-size: 1.5em; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 20px; font-size: 0.8em; letter-spacing: 1px; }
+        
+        /* 메인 프로그레스 (10문제 중 몇번인지) */
+        .main-progress { width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .main-fill { height: 100%; background: #302b63; width: 0%; transition: width 0.3s ease; }
+        
+        /* 2초 타임어택 바 */
+        .limit-bar-container { width: 100%; height: 4px; background: #eee; margin-bottom: 20px; display: none; }
+        .limit-bar-fill { height: 100%; background: #e74c3c; width: 100%; }
+
+        .info-header { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; color: #666; font-size: 0.85em; }
+        
+        .question-box { background: #fdfdfd; padding: 40px 20px; border-radius: 15px; margin-bottom: 20px; text-align: center; border: 2px solid #302b63; }
+        .question-text { font-size: 1.8em; color: #302b63; font-weight: bold; word-break: keep-all; }
+        
+        .options { display: flex; flex-direction: column; gap: 10px; min-height: 200px; }
         .option {
-            padding: 16px 22px; background: #fff; border: 2px solid #eee; border-radius: 12px;
-            cursor: pointer; transition: all 0.2s ease; font-size: 1em; text-align: left;
+            padding: 14px 20px; background: #fff; border: 2px solid #eee; border-radius: 10px;
+            cursor: pointer; transition: all 0.2s ease; font-size: 0.95em; text-align: left;
+            animation: fadeInOptions 0.4s ease-in;
         }
-        .option:hover { border-color: #1e3c72; background: #f0f4ff; transform: translateX(5px); }
-        .option.correct { background: #28a745 !important; color: white; border-color: #28a745; }
-        .option.incorrect { background: #dc3545 !important; color: white; border-color: #dc3545; }
+        @keyframes fadeInOptions { from { opacity: 0; } to { opacity: 1; } }
+
+        .option:hover { border-color: #302b63; background: #f4f7f9; }
+        .option.correct { background: #2ecc71 !important; color: white; border-color: #2ecc71; }
+        .option.incorrect { background: #e74c3c !important; color: white; border-color: #e74c3c; }
         .option.disabled { pointer-events: none; }
-        .btn { width: 100%; padding: 16px; font-size: 1.1em; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; margin-top: 25px; transition: 0.3s; }
-        .btn-primary { background: #1e3c72; color: white; }
-        .btn-primary:hover:not(:disabled) { background: #2a5298; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
-        .result-screen { text-align: center; display: none; }
-        .score-display { font-size: 5em; font-weight: bold; color: #1e3c72; margin: 15px 0; }
-        @media (max-width: 500px) { .container { padding: 25px 15px; } h1 { font-size: 1.5em; } .question-text { font-size: 1.3em; } }
+        
+        .waiting-msg { text-align: center; color: #302b63; font-weight: bold; margin-top: 50px; }
+        .timeout-msg { color: #e74c3c; font-weight: bold; text-align: center; margin-top: 10px; animation: flash 0.5s infinite; }
+        @keyframes flash { 50% { opacity: 0; } }
+
+        .result-screen { text-align: center; display: none; padding: 40px 0; }
+        .score-display { font-size: 5em; font-weight: bold; color: #302b63; margin: 15px 0; }
+        .btn-retry { width: 100%; padding: 16px; background: #302b63; color: white; font-weight: bold; border: none; border-radius: 12px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="quiz-screen">
-        <h1>🎹 음악 전문용어 마스터</h1>
-        <p class="subtitle">MUSIC BUSINESS TERMINOLOGY</p>
-        <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+        <h1>⚡ MUSIC TERMINOLOGY ATTACK</h1>
+        <p class="subtitle">단어 확인(3초) → 선택(2초 제한)</p>
+        
+        <div class="main-progress"><div class="main-fill" id="main-fill"></div></div>
+        <div class="limit-bar-container" id="limit-container"><div class="limit-bar-fill" id="limit-fill"></div></div>
+        
         <div class="info-header">
-            <span>Question <span id="current-idx">1</span> / 10</span>
-            <span>Score: <span id="current-score">0</span></span>
+            <span>Q <span id="current-idx">1</span> / 10</span>
+            <span>SCORE: <span id="current-score">0</span></span>
         </div>
+
         <div class="question-box">
-            <div class="question-text" id="question-text">Loading...</div>
+            <div class="question-text" id="question-text">READY?</div>
         </div>
+
+        <div id="status-msg"></div>
         <div class="options" id="options-container"></div>
-        <button class="btn btn-primary" id="next-btn" onclick="handleNextStep()" disabled>정답을 선택해주세요</button>
     </div>
 
     <div class="result-screen" id="result-screen">
-        <h1>RESULT</h1>
+        <h1>COMPLETED</h1>
         <div class="score-display" id="final-score">0</div>
-        <p id="score-message" style="margin-bottom: 30px; font-size: 1.1em; font-weight: 500;"></p>
-        <button class="btn btn-primary" onclick="startQuiz()">새로운 세트 시작 (10문제)</button>
+        <p id="score-message" style="margin-bottom: 30px; font-weight: 500;"></p>
+        <button class="btn-retry" onclick="startQuiz()">새로운 세트 시작</button>
     </div>
 </div>
 
 <script>
-    // 요청하신 모든 최신 데이터 반영 (중복 제거 및 포맷팅)
     const dictionary = [
         { english: "Sound Recording / Phonogram", korean: "음반 (녹음물)" },
         { english: "Public Performance Right", korean: "공연권" },
@@ -406,8 +425,8 @@
     let idx = 0;
     let score = 0;
     let isAnswered = false;
+    let mainTimer, limitTimer;
 
-    // 무작위 섞기
     function shuffle(arr) { return arr.sort(() => Math.random() - 0.5); }
 
     function startQuiz() {
@@ -421,54 +440,96 @@
     function showQuestion() {
         isAnswered = false;
         const q = currentQuestions[idx];
-        const btn = document.getElementById('next-btn');
-        btn.disabled = true; 
-        btn.innerText = "답안을 하나 골라주세요";
+        const optionsContainer = document.getElementById('options-container');
+        const statusMsg = document.getElementById('status-msg');
+        const limitContainer = document.getElementById('limit-container');
 
+        // 초기화
         document.getElementById('current-idx').innerText = idx + 1;
         document.getElementById('current-score').innerText = score;
         document.getElementById('question-text').innerText = q.english;
-        document.getElementById('progress-fill').style.width = `${(idx + 1) * 10}%`;
+        document.getElementById('main-fill').style.width = `${(idx + 1) * 10}%`;
+        optionsContainer.innerHTML = '';
+        limitContainer.style.display = 'none';
+        statusMsg.innerHTML = `<div class="waiting-msg">🤔 단어를 외우세요... (3초)</div>`;
 
-        // 보기 5개 생성 (정답 1 + 오답 4)
+        // 3초 대기 후 보기 등장
+        mainTimer = setTimeout(() => {
+            statusMsg.innerHTML = '';
+            renderOptions(q);
+        }, 3000);
+    }
+
+    function renderOptions(q) {
+        const container = document.getElementById('options-container');
+        const limitContainer = document.getElementById('limit-container');
+        const limitFill = document.getElementById('limit-fill');
+        
+        limitContainer.style.display = 'block';
+        limitFill.style.width = '100%';
+        limitFill.style.transition = 'none';
+
         const others = dictionary.filter(item => item.korean !== q.korean);
         const distractors = shuffle(others).slice(0, 4).map(item => item.korean);
         const options = shuffle([q.korean, ...distractors]);
 
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-        
         options.forEach((opt, i) => {
             const div = document.createElement('div');
             div.className = 'option';
             div.innerText = `${String.fromCharCode(65 + i)}. ${opt}`;
-            div.onclick = () => {
-                if(isAnswered) return;
-                isAnswered = true;
-                const all = document.querySelectorAll('.option');
-                all.forEach(o => o.classList.add('disabled'));
-                
-                if(opt === q.korean) {
-                    div.classList.add('correct');
-                    score += 10;
-                } else {
-                    div.classList.add('incorrect');
-                    all.forEach(o => { if(o.innerText.includes(q.korean)) o.classList.add('correct'); });
-                }
-                btn.disabled = false;
-                btn.innerText = (idx === 9) ? "최종 점수 확인" : "다음 문제 이동";
-            };
+            div.onclick = () => handleSelect(div, opt, q.korean);
             container.appendChild(div);
         });
+
+        // 2초 타임어택 시작
+        setTimeout(() => {
+            limitFill.style.transition = 'width 2s linear';
+            limitFill.style.width = '0%';
+        }, 10);
+
+        limitTimer = setTimeout(() => {
+            if (!isAnswered) handleTimeout(q.korean);
+        }, 2000);
     }
 
-    function handleNextStep() {
-        if (idx < 9) {
-            idx++;
-            showQuestion();
+    function handleSelect(el, selected, actual) {
+        if(isAnswered) return;
+        clearTimeout(limitTimer);
+        isAnswered = true;
+        
+        const all = document.querySelectorAll('.option');
+        all.forEach(o => o.classList.add('disabled'));
+        
+        if(selected === actual) {
+            el.classList.add('correct');
+            score += 10;
         } else {
-            showResult();
+            el.classList.add('incorrect');
+            all.forEach(o => { if(o.innerText.includes(actual)) o.classList.add('correct'); });
         }
+        goNext();
+    }
+
+    function handleTimeout(actual) {
+        isAnswered = true;
+        const all = document.querySelectorAll('.option');
+        all.forEach(o => {
+            o.classList.add('disabled');
+            if(o.innerText.includes(actual)) o.classList.add('correct');
+        });
+        document.getElementById('status-msg').innerHTML = `<div class="timeout-msg">⏰ TIME OUT! (틀림)</div>`;
+        goNext();
+    }
+
+    function goNext() {
+        setTimeout(() => {
+            if (idx < 9) {
+                idx++;
+                showQuestion();
+            } else {
+                showResult();
+            }
+        }, 1200);
     }
 
     function showResult() {
@@ -476,12 +537,9 @@
         document.getElementById('result-screen').style.display = 'block';
         document.getElementById('final-score').innerText = score;
         
-        let msg = "";
-        if (score === 100) msg = "🎖️ 완벽합니다! 음악 저작권 및 비즈니스 마스터군요!";
-        else if (score >= 80) msg = "👏 훌륭합니다! 전문 지식이 매우 풍부하시네요.";
-        else if (score >= 50) msg = "🙂 좋은 성적입니다. 조금만 더 공부하면 완벽하겠어요!";
-        else msg = "📚 용어들이 꽤 까다롭죠? 다시 한 번 복습해볼까요?";
-        
+        let msg = score === 100 ? "⚡ 신의 경지! 완벽한 순발력입니다!" : 
+                  score >= 70 ? "🔥 대단해요! 순발력이 엄청나시네요." : 
+                  "📚 용어를 좀 더 익히고 다시 도전해보세요!";
         document.getElementById('score-message').innerText = msg;
     }
 
