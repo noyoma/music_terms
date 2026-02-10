@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>음악 용어 타임어택 퀴즈</title>
+    <title>음악산업 영어 타임어택 퀴즈</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -75,7 +75,7 @@
 
     <div id="quiz-screen" class="hidden">
         <h1>⚡ MUSIC TERMINOLOGY ATTACK</h1>
-        <p class="subtitle">단어 확인(3초) → 선택(2.3초 제한)</p>
+        <p class="subtitle">단어 확인(3초) → 선택(2.7초 제한)</p>
         
         <div class="main-progress"><div class="main-fill" id="main-fill"></div></div>
         <div class="limit-bar-container" id="limit-container"><div class="limit-bar-fill" id="limit-fill"></div></div>
@@ -454,7 +454,7 @@
         limitContainer.style.display = 'none';
         statusMsg.innerHTML = `🤔 단어를 외우세요... (3초)`;
 
-        // [변경] 보기 등장 전 대기 시간: 3초 (3000ms)
+        // [설정] 보기 등장 전 대기 시간: 3초
         mainTimer = setTimeout(() => {
             statusMsg.innerHTML = '';
             renderOptions(q);
@@ -471,7 +471,8 @@
         limitFill.style.transition = 'none';
 
         const others = dictionary.filter(item => item.korean !== q.korean);
-        const distractors = shuffle(others).slice(0, 4).map(item => item.korean);
+        // [설정] 보기 개수를 4개로 조정 (정답 1 + 오답 3)
+        const distractors = shuffle(others).slice(0, 3).map(item => item.korean);
         const options = shuffle([q.korean, ...distractors]);
 
         options.forEach((opt, i) => {
@@ -482,16 +483,16 @@
             container.appendChild(div);
         });
 
-        // [변경] 타이머 바 애니메이션 시간: 2.3초 (2.3s)
+        // [설정] 타이머 바 애니메이션 시간: 2.7초
         setTimeout(() => {
-            limitFill.style.transition = 'width 2.3s linear';
+            limitFill.style.transition = 'width 2.7s linear';
             limitFill.style.width = '0%';
         }, 10);
 
-        // [변경] 답안 선택 제한 시간: 2.3초 (2300ms)
+        // [설정] 답안 선택 제한 시간: 2.7초
         limitTimer = setTimeout(() => {
             if (!isAnswered) handleTimeout(q.korean);
-        }, 2300);
+        }, 2700);
     }
 
     function handleSelect(el, selected, actual) {
